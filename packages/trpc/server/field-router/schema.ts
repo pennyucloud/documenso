@@ -155,6 +155,7 @@ export const ZSignFieldWithTokenMutationSchema = z.object({
   fieldId: z.number(),
   value: z.string().trim().optional(),
   isBase64: z.boolean().optional(),
+  isQrSignature: z.boolean().optional(),
   authOptions: ZRecipientActionAuthSchema.optional(),
 });
 

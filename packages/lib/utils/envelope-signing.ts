@@ -242,9 +242,10 @@ export const extractFieldInsertionValues = ({
         };
       }
 
-      const isBase64 = isBase64Image(value);
+      const isQr = value.startsWith('__qr__:');
+      const isBase64 = !isQr && isBase64Image(value);
 
-      if (documentMeta.typedSignatureEnabled === false && !isBase64) {
+      if (documentMeta.typedSignatureEnabled === false && !isBase64 && !isQr) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
           message: 'Typed signatures are not allowed. Please draw your signature',
         });

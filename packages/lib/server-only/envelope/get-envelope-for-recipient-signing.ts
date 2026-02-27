@@ -37,6 +37,7 @@ export const ZEnvelopeForSigningResponse = z.object({
     authOptions: true,
     userId: true,
     teamId: true,
+    qrToken: true,
   }).extend({
     documentMeta: DocumentMetaSchema.pick({
       signingOrder: true,
@@ -47,6 +48,7 @@ export const ZEnvelopeForSigningResponse = z.object({
       typedSignatureEnabled: true,
       uploadSignatureEnabled: true,
       drawSignatureEnabled: true,
+      qrSignatureEnabled: true,
       allowDictateNextSigner: true,
       language: true,
     }),

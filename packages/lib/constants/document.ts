@@ -69,4 +69,11 @@ export const DOCUMENT_SIGNATURE_TYPES = {
     }),
     value: DocumentSignatureType.UPLOAD,
   },
+  [DocumentSignatureType.QR]: {
+    label: msg({
+      message: `QR Code`,
+      context: `QR Code signature`,
+    }),
+    value: DocumentSignatureType.QR,
+  },
 } satisfies Record<DocumentSignatureType, DocumentSignatureTypeData>;

@@ -13,6 +13,8 @@ type HandleSignatureFieldClickOptions = {
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
+  qrSignatureEnabled?: boolean;
+  qrVerificationUrl?: string;
 };
 
 export const handleSignatureFieldClick = async (
@@ -25,6 +27,8 @@ export const handleSignatureFieldClick = async (
     typedSignatureEnabled,
     uploadSignatureEnabled,
     drawSignatureEnabled,
+    qrSignatureEnabled,
+    qrVerificationUrl,
   } = options;
 
   if (field.type !== FieldType.SIGNATURE) {
@@ -48,6 +52,8 @@ export const handleSignatureFieldClick = async (
       typedSignatureEnabled,
       uploadSignatureEnabled,
       drawSignatureEnabled,
+      qrSignatureEnabled,
+      qrVerificationUrl,
     });
   }
 

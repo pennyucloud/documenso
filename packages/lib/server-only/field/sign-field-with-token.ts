@@ -33,6 +33,7 @@ export type SignFieldWithTokenOptions = {
   fieldId: number;
   value: string;
   isBase64?: boolean;
+  isQrSignature?: boolean;
   userId?: number;
   authOptions?: TRecipientActionAuth;
   requestMetadata?: RequestMetadata;
@@ -53,6 +54,7 @@ export const signFieldWithToken = async ({
   fieldId,
   value,
   isBase64,
+  isQrSignature,
   userId,
   authOptions,
   requestMetadata,
@@ -196,7 +198,8 @@ export const signFieldWithToken = async ({
   let customText = !isSignatureField ? value : undefined;
 
   const signatureImageAsBase64 = isSignatureField && isBase64 ? value : undefined;
-  const typedSignature = isSignatureField && !isBase64 ? value : undefined;
+  const typedSignature = isSignatureField && !isBase64 && !isQrSignature ? value : undefined;
+  const qrSignature = isSignatureField && isQrSignature ? true : undefined;
 
   if (field.type === FieldType.DATE) {
     customText = DateTime.now()
@@ -204,12 +207,16 @@ export const signFieldWithToken = async ({
       .toFormat(documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
   }
 
-  if (isSignatureField && !signatureImageAsBase64 && !typedSignature) {
+  if (isSignatureField && !signatureImageAsBase64 && !typedSignature && !qrSignature) {
     throw new Error('Signature field must have a signature');
   }
 
   if (isSignatureField && documentMeta?.typedSignatureEnabled === false && typedSignature) {
     throw new Error('Typed signatures are not allowed. Please draw your signature');
+  }
+
+  if (isSignatureField && documentMeta?.qrSignatureEnabled === false && qrSignature) {
+    throw new Error('QR signatures are not allowed for this document');
   }
 
   if (field.fieldMeta?.readOnly && !AUTO_SIGNABLE_FIELD_TYPES.includes(field.type)) {
@@ -258,10 +265,12 @@ export const signFieldWithToken = async ({
           recipientId: field.recipientId,
           signatureImageAsBase64: signatureImageAsBase64,
           typedSignature: typedSignature,
+          qrSignature: qrSignature,
         },
         update: {
           signatureImageAsBase64: signatureImageAsBase64,
           typedSignature: typedSignature,
+          qrSignature: qrSignature,
         },
       });
 
@@ -292,7 +301,7 @@ export const signFieldWithToken = async ({
           field: match(updatedField.type)
             .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
               type,
-              data: signatureImageAsBase64 || typedSignature || '',
+              data: qrSignature ? 'qr-signature' : (signatureImageAsBase64 || typedSignature || ''),
             }))
             .with(
               FieldType.DATE,

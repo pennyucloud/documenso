@@ -1,4 +1,4 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -48,6 +48,22 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
           },
         },
       },
+      recipients: {
+        where: {
+          signingStatus: SigningStatus.SIGNED,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          signedAt: true,
+          signingStatus: true,
+        },
+        orderBy: {
+          signedAt: 'asc',
+        },
+      },
       _count: {
         select: {
           recipients: true,
@@ -64,11 +80,13 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
 
   return {
     id: mapSecondaryIdToDocumentId(result.secondaryId),
+    envelopeId: result.id,
     internalVersion: result.internalVersion,
     title: result.title,
     completedAt: result.completedAt,
     envelopeItems: result.envelopeItems,
     recipientCount: result._count.recipients,
     documentTeamUrl: result.team.url,
+    signers: result.recipients,
   };
 };

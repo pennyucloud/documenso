@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import { P, match } from 'ts-pattern';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
@@ -71,6 +72,11 @@ export const DocumentSigningPageViewV1 = ({
   includeSenderDetails,
 }: DocumentSigningPageViewV1Props) => {
   const { documentData, documentMeta } = document;
+
+  const qrVerificationUrl =
+    documentMeta?.qrSignatureEnabled && document.qrToken
+      ? `${NEXT_PUBLIC_WEBAPP_URL()}/share/${document.qrToken}`
+      : undefined;
 
   const { derivedRecipientAccessAuth, user: authUser } = useRequiredDocumentSigningAuthContext();
 
@@ -418,6 +424,8 @@ export const DocumentSigningPageViewV1 = ({
                     typedSignatureEnabled={documentMeta?.typedSignatureEnabled}
                     uploadSignatureEnabled={documentMeta?.uploadSignatureEnabled}
                     drawSignatureEnabled={documentMeta?.drawSignatureEnabled}
+                    qrSignatureEnabled={documentMeta?.qrSignatureEnabled}
+                    qrVerificationUrl={qrVerificationUrl}
                   />
                 ))
                 .with(FieldType.INITIALS, () => (

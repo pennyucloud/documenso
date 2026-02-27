@@ -7,6 +7,7 @@ import { type Field, type Recipient, RecipientRole } from '@prisma/client';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
@@ -80,6 +81,11 @@ export const DocumentSigningForm = ({
   );
 
   const hasSignatureField = fields.some((field) => isSignatureFieldType(field.type));
+
+  const qrVerificationUrl =
+    document.documentMeta?.qrSignatureEnabled && document.qrToken
+      ? `${NEXT_PUBLIC_WEBAPP_URL()}/share/${document.qrToken}`
+      : undefined;
 
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));
@@ -287,6 +293,8 @@ export const DocumentSigningForm = ({
                         typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
                         uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
                         drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
+                        qrSignatureEnabled={document.documentMeta?.qrSignatureEnabled}
+                        qrVerificationUrl={qrVerificationUrl}
                       />
                     </div>
                   )}
