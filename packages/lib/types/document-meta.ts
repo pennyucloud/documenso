@@ -108,6 +108,10 @@ export const ZDocumentMetaUploadSignatureEnabledSchema = z
   .boolean()
   .describe('Whether to allow recipients to sign using an uploaded signature.');
 
+export const ZDocumentMetaQrSignatureEnabledSchema = z
+  .boolean()
+  .describe('Whether to allow recipients to sign using a QR code signature.');
+
 /**
  * Note: Any updates to this will cause public API changes. You will need to update
  * all corresponding areas where this is used (some places that use this needs to pass
@@ -126,6 +130,7 @@ export const ZDocumentMetaCreateSchema = z.object({
   typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
   uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
   drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+  qrSignatureEnabled: ZDocumentMetaQrSignatureEnabledSchema.optional(),
   emailId: z.string().nullish(),
   emailReplyTo: z.string().email().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.nullish(),

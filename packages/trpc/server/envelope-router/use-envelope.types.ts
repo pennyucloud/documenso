@@ -10,6 +10,7 @@ import {
   ZDocumentMetaDrawSignatureEnabledSchema,
   ZDocumentMetaLanguageSchema,
   ZDocumentMetaMessageSchema,
+  ZDocumentMetaQrSignatureEnabledSchema,
   ZDocumentMetaRedirectUrlSchema,
   ZDocumentMetaSubjectSchema,
   ZDocumentMetaTimezoneSchema,
@@ -97,6 +98,7 @@ export const ZUseEnvelopePayloadSchema = z.object({
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+      qrSignatureEnabled: ZDocumentMetaQrSignatureEnabledSchema.optional(),
       allowDictateNextSigner: z.boolean().optional(),
       envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
     })

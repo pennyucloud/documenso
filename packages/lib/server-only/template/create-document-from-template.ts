@@ -120,6 +120,7 @@ export type CreateDocumentFromTemplateOptions = {
     typedSignatureEnabled?: boolean;
     uploadSignatureEnabled?: boolean;
     drawSignatureEnabled?: boolean;
+    qrSignatureEnabled?: boolean;
     envelopeExpirationPeriod?: TEnvelopeExpirationPeriod | null;
   };
 
@@ -521,6 +522,8 @@ export const createDocumentFromTemplate = async ({
         override?.uploadSignatureEnabled ?? template.documentMeta?.uploadSignatureEnabled,
       drawSignatureEnabled:
         override?.drawSignatureEnabled ?? template.documentMeta?.drawSignatureEnabled,
+      qrSignatureEnabled:
+        override?.qrSignatureEnabled ?? template.documentMeta?.qrSignatureEnabled,
       allowDictateNextSigner:
         override?.allowDictateNextSigner ?? template.documentMeta?.allowDictateNextSigner,
       envelopeExpirationPeriod:

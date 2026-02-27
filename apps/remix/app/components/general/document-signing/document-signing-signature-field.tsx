@@ -3,7 +3,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
+import { Loader, QrCodeIcon } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -27,7 +27,7 @@ import { DocumentSigningFieldContainer } from './document-signing-field-containe
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
 import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
-type SignatureFieldState = 'empty' | 'signed-image' | 'signed-text';
+type SignatureFieldState = 'empty' | 'signed-image' | 'signed-text' | 'signed-qr';
 
 export type DocumentSigningSignatureFieldProps = {
   field: FieldWithSignature;
@@ -36,6 +36,12 @@ export type DocumentSigningSignatureFieldProps = {
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
+  qrSignatureEnabled?: boolean;
+  /**
+   * The full verification URL for the document QR code (e.g. https://app.documenso.com/share/qr_xxx).
+   * Only needed when qrSignatureEnabled is true.
+   */
+  qrVerificationUrl?: string;
 };
 
 export const DocumentSigningSignatureField = ({
@@ -45,6 +51,8 @@ export const DocumentSigningSignatureField = ({
   typedSignatureEnabled,
   uploadSignatureEnabled,
   drawSignatureEnabled,
+  qrSignatureEnabled,
+  qrVerificationUrl,
 }: DocumentSigningSignatureFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -84,12 +92,16 @@ export const DocumentSigningSignatureField = ({
       return 'empty';
     }
 
+    if (signature?.qrSignature) {
+      return 'signed-qr';
+    }
+
     if (signature?.signatureImageAsBase64) {
       return 'signed-image';
     }
 
     return 'signed-text';
-  }, [field.inserted, signature?.signatureImageAsBase64]);
+  }, [field.inserted, signature?.signatureImageAsBase64, signature?.qrSignature]);
 
   const onPreSign = () => {
     if (!providedSignature) {
@@ -125,7 +137,8 @@ export const DocumentSigningSignatureField = ({
         return;
       }
 
-      const isTypedSignature = !value.startsWith('data:image');
+      const isQrSignature = value.startsWith('__qr__:');
+      const isTypedSignature = !isQrSignature && !value.startsWith('data:image');
 
       if (isTypedSignature && typedSignatureEnabled === false) {
         toast({
@@ -140,8 +153,9 @@ export const DocumentSigningSignatureField = ({
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-        value,
-        isBase64: !isTypedSignature,
+        value: isQrSignature ? value.replace('__qr__:', '') : value,
+        isBase64: !isTypedSignature && !isQrSignature,
+        isQrSignature,
         authOptions,
       };
 
@@ -270,6 +284,15 @@ export const DocumentSigningSignatureField = ({
         </div>
       )}
 
+      {state === 'signed-qr' && (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-1 p-1">
+          <QrCodeIcon className="h-6 w-6 text-muted-foreground" />
+          <p className="text-center text-[clamp(0.4rem,15cqw,0.65rem)] font-medium leading-tight text-muted-foreground">
+            <Trans>QR Signed</Trans>
+          </p>
+        </div>
+      )}
+
       <Dialog open={showSignatureModal} onOpenChange={setShowSignatureModal}>
         <DialogContent>
           <DialogTitle>
@@ -287,6 +310,8 @@ export const DocumentSigningSignatureField = ({
             typedSignatureEnabled={typedSignatureEnabled}
             uploadSignatureEnabled={uploadSignatureEnabled}
             drawSignatureEnabled={drawSignatureEnabled}
+            qrSignatureEnabled={qrSignatureEnabled}
+            qrVerificationUrl={qrVerificationUrl}
           />
 
           <DocumentSigningDisclosure />

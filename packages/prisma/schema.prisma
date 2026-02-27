@@ -515,6 +515,7 @@ model DocumentMeta {
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
   drawSignatureEnabled   Boolean @default(true)
+  qrSignatureEnabled     Boolean @default(true)
 
   language           String                     @default("en")
   distributionMethod DocumentDistributionMethod @default(EMAIL)
@@ -647,6 +648,7 @@ model Signature {
   fieldId                Int      @unique
   signatureImageAsBase64 String?
   typedSignature         String?
+  qrSignature            Boolean? /// @zod.boolean.describe("Indicates this signature was made via QR code scan verification.")
 
   recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   field     Field     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
@@ -831,6 +833,7 @@ model OrganisationGlobalSettings {
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
   drawSignatureEnabled   Boolean @default(true)
+  qrSignatureEnabled     Boolean @default(true)
 
   defaultRecipients Json? /// [DefaultRecipient[]] @zod.custom.use(ZDefaultRecipientsSchema)
 
@@ -870,6 +873,7 @@ model TeamGlobalSettings {
   typedSignatureEnabled  Boolean?
   uploadSignatureEnabled Boolean?
   drawSignatureEnabled   Boolean?
+  qrSignatureEnabled     Boolean?
 
   defaultRecipients Json? /// [DefaultRecipient[]] @zod.custom.use(ZDefaultRecipientsSchema)
 

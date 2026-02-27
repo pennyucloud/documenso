@@ -16,6 +16,7 @@ import { match } from 'ts-pattern';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '@documenso/lib/constants/direct-templates';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
@@ -379,6 +380,11 @@ export default function EnvelopeSignerPageRenderer() {
             typedSignatureEnabled: envelope.documentMeta.typedSignatureEnabled,
             uploadSignatureEnabled: envelope.documentMeta.uploadSignatureEnabled,
             drawSignatureEnabled: envelope.documentMeta.drawSignatureEnabled,
+            qrSignatureEnabled: envelope.documentMeta.qrSignatureEnabled,
+            qrVerificationUrl:
+              envelope.documentMeta.qrSignatureEnabled && envelope.qrToken
+                ? `${NEXT_PUBLIC_WEBAPP_URL()}/share/${envelope.qrToken}`
+                : undefined,
           })
             .then(async (payload) => {
               if (payload) {

@@ -333,12 +333,14 @@ export const EnvelopeSigningProvider = ({
     };
 
     if (fieldValue.type === FieldType.SIGNATURE) {
-      const isBase64 = isBase64Image(fieldValue.value || '');
+      const isQr = (fieldValue.value || '').startsWith('__qr__:');
+      const isBase64 = !isQr && isBase64Image(fieldValue.value || '');
 
       updatedField.signature = fieldValue.value
         ? {
             signatureImageAsBase64: isBase64 ? fieldValue.value : null,
-            typedSignature: isBase64 ? null : fieldValue.value,
+            typedSignature: !isBase64 && !isQr ? fieldValue.value : null,
+            qrSignature: isQr ? true : null,
             recipientId: recipient.id,
             created: new Date(),
             // Dummy IDs.

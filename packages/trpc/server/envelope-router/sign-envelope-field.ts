@@ -188,6 +188,7 @@ export const signEnvelopeFieldRoute = procedure
 
     let signatureImageAsBase64 = null;
     let typedSignature = null;
+    let qrSignature = null;
 
     if (field.type === FieldType.SIGNATURE) {
       if (fieldValue.type !== FieldType.SIGNATURE) {
@@ -197,10 +198,15 @@ export const signEnvelopeFieldRoute = procedure
       }
 
       if (fieldValue.value) {
-        const isBase64 = isBase64Image(fieldValue.value);
+        const isQr = fieldValue.value.startsWith('__qr__:');
+        const isBase64 = !isQr && isBase64Image(fieldValue.value);
 
-        signatureImageAsBase64 = isBase64 ? fieldValue.value : null;
-        typedSignature = !isBase64 ? fieldValue.value : null;
+        if (isQr) {
+          qrSignature = true;
+        } else {
+          signatureImageAsBase64 = isBase64 ? fieldValue.value : null;
+          typedSignature = !isBase64 ? fieldValue.value : null;
+        }
       }
     }
 
@@ -228,10 +234,12 @@ export const signEnvelopeFieldRoute = procedure
             recipientId: field.recipientId,
             signatureImageAsBase64: signatureImageAsBase64,
             typedSignature: typedSignature,
+            qrSignature: qrSignature,
           },
           update: {
             signatureImageAsBase64: signatureImageAsBase64,
             typedSignature: typedSignature,
+            qrSignature: qrSignature,
           },
         });
 
@@ -262,7 +270,7 @@ export const signEnvelopeFieldRoute = procedure
             field: match(updatedField.type)
               .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
                 type,
-                data: signatureImageAsBase64 || typedSignature || '',
+                data: qrSignature ? 'qr-signature' : (signatureImageAsBase64 || typedSignature || ''),
               }))
               .with(
                 FieldType.DATE,
